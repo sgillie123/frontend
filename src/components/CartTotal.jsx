@@ -4,7 +4,6 @@ import { ShopContext } from "../context/ShopContext"
 const CartTotal = () => {
   const { products, currency, cartItems, delivery_fee, navigate } = useContext(ShopContext)
 
-  // Calculate subtotal
   const calculateSubtotal = () => {
     let subtotal = 0
 
@@ -23,30 +22,28 @@ const CartTotal = () => {
     return subtotal
   }
 
-  // Calculate price based on quantity option and product category
   const calculateItemPrice = (product, quantityOption) => {
-    if (!product) return 0
+    if (!product) return 0    
 
-    if (product.category === "cookies") {
+    const isCake =
+      product.category === "Cakes" || product.sizes?.includes("CAKE") || quantityOption === "CAKE"
+
+    if (isCake) {
+      return product.price || 0
+    }
+
+    if (["Cookies", "Cupcakes", "Muffins"].includes(product.category)) {
+      const basePrice = product.price || 2.5
       switch (quantityOption) {
         case "6":
-          return 12
+          return basePrice * 4
         case "12":
-          return 20
+          return basePrice * 8
         default:
-          return 2.50
-      }
-    } else if (product.category === "cupcakes") {
-      switch (quantityOption) {
-        case "6":
-          return 15
-        case "12":
-          return 30
-        default:
-          return 4
+          return basePrice
       }
     } else {
-      return product.price || 0 // For cakes or other categories
+      return product.price || 0
     }
   }
 
@@ -62,7 +59,6 @@ const CartTotal = () => {
       </div>
 
       <div className="space-y-2">
-        {/* Subtotal Row */}
         <div className="flex justify-between py-2">
           <span className="text-gray-600">Subtotal</span>
           <span className="font-medium">
@@ -70,7 +66,6 @@ const CartTotal = () => {
           </span>
         </div>
 
-        {/* Shipping Fee Row */}
         <div className="flex justify-between py-2 bg-gray-50">
           <span className="text-gray-600">Shipping Fee</span>
           <span className="font-medium">
@@ -78,7 +73,6 @@ const CartTotal = () => {
           </span>
         </div>
 
-        {/* Total Row */}
         <div className="flex justify-between py-3 border-t">
           <span className="font-medium text-gray-700">Total</span>
           <span className="font-bold text-lg">
@@ -86,10 +80,8 @@ const CartTotal = () => {
           </span>
         </div>
       </div>
-
     </div>
   )
 }
 
 export default CartTotal
-
