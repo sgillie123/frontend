@@ -240,7 +240,7 @@ export const products = [
     {
         _id: '14',
         name: 'Snickerdoodle cookies',
-        description: 'Buttery, crisp cookies filled with crunchy, with rich white macadamia nuts .',
+        description: 'Soft and chewy snickerdoodle cookies rolled in cinnamon sugar, with a buttery center and a subtle tangy twist.',
         price: 2.50,
         image: [snickerdoodle],
         category: 'Cookies',
@@ -252,7 +252,7 @@ export const products = [
     {
         _id: '15',
         name: 'Peanut butter cookies',
-        description: 'Buttery, crisp cookies filled with crunchy, with rich white macadamia nuts .',
+        description: 'Classic peanut butter cookies with a soft, chewy center and rich, nutty flavor in every bite.',
         price: 2.50,
         image: [peanut],
         category: 'Cookies',
@@ -264,7 +264,7 @@ export const products = [
     {
         _id: '16',
         name: 'Brownies',
-        description: 'Buttery, crisp cookies filled with crunchy, with rich white macadamia nuts .',
+        description: 'Fudgy, rich brownies with a crackly top and deep chocolate flavor in every decadent bite.',
         price: 3.50,
         image: [brownie],
         category: 'Cookies',
@@ -276,7 +276,7 @@ export const products = [
     {
         _id: '17',
         name: 'Banana Nut muffins',
-        description: 'Sweet, light, fruity strawberry cupcake with creamy frosting.',
+        description: 'Moist and fluffy banana nut muffins, packed with ripe banana flavor and crunchy toasted walnuts in every bite.',
         price: 5,
         image: [banana],
         category: 'Muffins',
@@ -288,7 +288,7 @@ export const products = [
     {
         _id: '18',
         name: 'Chocolate muffins',
-        description: 'Sweet, light, fruity strawberry cupcake with creamy frosting.',
+        description: 'Rich and moist chocolate muffins bursting with deep cocoa flavor and melty chocolate chips in every bite.',
         price: 5,
         image: [choco_muffin],
         category: 'Muffins',
@@ -312,7 +312,7 @@ export const products = [
     {
         _id: '20',
         name: 'Plain muffins',
-        description: 'Sweet, light, fruity strawberry cupcake with creamy frosting.',
+        description: 'Light, fluffy, and golden muffins with a subtly sweet flavor—perfect as a classic breakfast or snack.',
         price: 5,
         image: [plain],
         category: 'Muffins',
@@ -324,7 +324,7 @@ export const products = [
     {
         _id: '21',
         name: 'Blueberry muffins',
-        description: 'Sweet, light, fruity strawberry cupcake with creamy frosting.',
+        description: 'Moist and fluffy blueberry muffins bursting with juicy berries and a hint of sweetness in every bite.',
         price: 5,
         image: [blueberry],
         category: 'Muffins',
