@@ -8,8 +8,9 @@ const LatestCollection = () => {
     const [latestProducts, setLatestProducts] = useState([]);
 
     useEffect(() => {
+        const cookies = products.filter(item => item.category === 'Cookies');
         setLatestProducts(products.slice(0, 6));  // Set latest products
-    }, [products]);  // Re-run effect if products change
+    }, []);  
 
     return (
         <div className="my-10">
