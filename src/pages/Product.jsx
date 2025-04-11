@@ -1,5 +1,3 @@
-"use client"
-
 import { useContext, useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 import { ShopContext } from "../context/ShopContext"
@@ -26,26 +24,24 @@ const Product = () => {
   const getPrice = () => {
     if (!productData) return 0
 
-    if (productData.category === "cookies") {
+    const isCake = productData.category === "Cakes" || productData.sizes?.includes("CAKE")
+
+    if (isCake) {
+      return productData.price || 0
+    }
+
+    if (["Cookies", "Cupcakes", "Muffins"].includes(productData.category)) {
+      const basePrice = productData.price || 2.5
       switch (selectedQty) {
         case "6":
-          return 12
+          return basePrice * 4
         case "12":
-          return 20
+          return basePrice * 8
         default:
-          return 2.5
-      }
-    } else if (productData.category === "cupcakes") {
-      switch (selectedQty) {
-        case "6":
-          return 15
-        case "12":
-          return 30
-        default:
-          return 4
+          return basePrice
       }
     } else {
-      return productData.price || 0 // For cakes or other categories
+      return productData.price || 0
     }
   }
 
@@ -53,10 +49,8 @@ const Product = () => {
     if (productData && !isAddingToCart) {
       try {
         setIsAddingToCart(true)
-        await addToCart(productData._id, selectedQty)
-        console.log("Added to cart:", productData._id, selectedQty)
-
-        // Show added to cart message
+        const sizeToAdd = isCakeProduct() ? "CAKE" : selectedQty
+        await addToCart(productData._id, sizeToAdd)
         setAddedToCart(true)
         setTimeout(() => {
           setAddedToCart(false)
@@ -67,6 +61,10 @@ const Product = () => {
         setIsAddingToCart(false)
       }
     }
+  }
+
+  const isCakeProduct = () => {
+    return productData?.category === "Cakes" || productData?.sizes?.includes("CAKE")
   }
 
   useEffect(() => {
@@ -81,7 +79,6 @@ const Product = () => {
 
   return (
     <div className="border-t-2 pt-10 transition-opacity ease-in duration-500 opacity-100">
-      {/* Product data */}
       <div className="flex gap-12 sm:gap-12 flex-col sm:flex-row">
         <div className="flex-1 flex flex-col-reverse gap-3 sm:flex-row">
           <div className="flex sm:flex-col overflow-x-auto sm:overflow-y-scroll justify-between sm:justify-normal sm:w-[18.7%] w-full">
@@ -110,7 +107,6 @@ const Product = () => {
           </div>
         </div>
 
-        {/* Product info */}
         <div className="flex-1">
           <h1 className="font-medium text-2xl mt-2">{productData.name}</h1>
           <div className="flex items-center gap-1 mt-2">
@@ -129,26 +125,29 @@ const Product = () => {
           <p className="mt-5 text-gray-500 md:w-4/5">{productData.description}</p>
 
           <div className="flex flex-col gap-4 my-8">
-            <p>Select Amount</p>
-
-            {(productData.category === "cookies" || productData.category === "cupcakes") && (
-              <div className="flex gap-2">
-                {[
-                  { label: "One", value: "1" },
-                  { label: "Half Dozen", value: "6" },
-                  { label: "Dozen", value: "12" },
-                ].map(({ label, value }) => (
-                  <button
-                    key={value}
-                    className={`px-3 py-1 border text-md ${
-                      selectedQty === value ? "bg-black text-white" : "text-black"
-                    }`}
-                    onClick={() => setSelectedQty(value)}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
+            {!isCakeProduct() && (
+              <>
+                <p>Select Amount</p>
+                {["Cookies", "Cupcakes", "Muffins"].includes(productData.category) && (
+                  <div className="flex gap-2">
+                    {[
+                      { label: "One", value: "1" },
+                      { label: "Half Dozen", value: "6" },
+                      { label: "Dozen", value: "12" },
+                    ].map(({ label, value }) => (
+                      <button
+                        key={value}
+                        className={`px-3 py-1 border text-md ${
+                          selectedQty === value ? "bg-black text-white" : "text-black"
+                        }`}
+                        onClick={() => setSelectedQty(value)}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </>
             )}
 
             <div className="relative">
@@ -173,7 +172,6 @@ const Product = () => {
           </div>
         </div>
       </div>
-      {/* description and review */}
       <div className="mt-20">
         <div className="flex">
           <b className="border px-5 py-3 text-sm">Description</b>
@@ -182,16 +180,15 @@ const Product = () => {
         <div className="flex flex-col gap-4 border px-6 py-6 text-sm text-gray-500">
           <p>
             Our bakery is built on a love for sharing sweet moments, one bite at a time. We specialize in homemade
-            cookies, cupcakes, and cakes, each made with care, creativity, and the finest ingredients. Whether you're
-            celebrating something special or just treating yourself, our baked goods are crafted to bring joy and
-            comfort with every bite.
+            Cookies, Cupcakes, Cakes, and Muffins, each made with care, creativity, and the finest ingredients. Whether
+            you're celebrating something special or just treating yourself, our baked goods are crafted to bring joy
+            and comfort with every bite.
           </p>
           <p>
-            From soft and chewy cookies to fluffy cupcakes and rich, decadent cakes, there's something for every sweet
-            tooth. Our online shop makes it easy to explore our menu, choose your favorite flavors, and order exactly
-            what you need — whether it's one treat, a half dozen, or a full box to share.
+            From soft and chewy Cookies to fluffy Cupcakes, rich Cakes, and golden Muffins, there's something for every
+            sweet tooth. Our online shop makes it easy to explore our menu, choose your favorite flavors, and order
+            exactly what you need — whether it's one treat, a half dozen, or a full box to share.
           </p>
-          {/* display related products */}
           <RelatedProducts category={productData.category} subCategory={productData.subCategory} />
         </div>
       </div>
