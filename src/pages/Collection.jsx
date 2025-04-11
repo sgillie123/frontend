@@ -76,7 +76,7 @@ const sortProduct = () => {
 
 useEffect(()=>{
   applyFilter();
-},[category, subCategory, search, showSearch])
+},[category, subCategory, search, showSearch, products])
 
 useEffect(()=>{
   sortProduct();
@@ -97,16 +97,16 @@ useEffect(()=>{
           <p className='mb-3 text-sm font-medium'>CATEGORIES</p>
           <div className='flex flex-col gap-2 text-sm font-light text-gray-700'>
             <p className='flex gap-2'>
-              <input className='w-3' type="checkbox" value={'cookies'} onChange={toggleCategory}/> Cookies
+              <input className='w-3' type="checkbox" value={'Cookies'} onChange={toggleCategory}/> Cookies
             </p>
             <p className='flex gap-2'>
-              <input className='w-3' type="checkbox" value={'cupcakes'} onChange={toggleCategory}/> Cupcakes
+              <input className='w-3' type="checkbox" value={'Cupcakes'} onChange={toggleCategory}/> Cupcakes
             </p>
             <p className='flex gap-2'>
-              <input className='w-3' type="checkbox" value={'cakes'} onChange={toggleCategory}/> Cakes
+              <input className='w-3' type="checkbox" value={'Cakes'} onChange={toggleCategory}/> Cakes
             </p>
             <p className='flex gap-2'>
-              <input className='w-3' type="checkbox" value={'muffins'} onChange={toggleCategory}/> Muffins
+              <input className='w-3' type="checkbox" value={'Muffins'} onChange={toggleCategory}/> Muffins
             </p>
           </div>
         </div>
@@ -115,13 +115,13 @@ useEffect(()=>{
           <p className='mb-3 text-sm font-medium'>TYPE</p>
           <div className='flex flex-col gap-2 text-sm font-light text-gray-700'>
             <p className='flex gap-2'>
-              <input className='w-3' type="checkbox" value={'vanilla'} onChange={toggleSubCategory}/> Vanilla
+              <input className='w-3' type="checkbox" value={'Vanilla'} onChange={toggleSubCategory}/> Vanilla
             </p>
             <p className='flex gap-2'>
-              <input className='w-3' type="checkbox" value={'chocolate'} onChange={toggleSubCategory}/> Chocolate
+              <input className='w-3' type="checkbox" value={'Chocolate'} onChange={toggleSubCategory}/> Chocolate
             </p>
             <p className='flex gap-2'>
-              <input className='w-3' type="checkbox" value={'other'} onChange={toggleSubCategory}/> Other
+              <input className='w-3' type="checkbox" value={'Other'} onChange={toggleSubCategory}/> Other
             </p>
           </div>
         </div>
