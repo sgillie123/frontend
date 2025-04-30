@@ -42,7 +42,7 @@ const Cart = () => {
   const calculatePrice = (product, quantityOption) => {
     if (!product) return 0
 
-    if (product.category === "cookies") {
+    if (product.category === "Cookies") {
       switch (quantityOption) {
         case "6":
           return 12
@@ -51,7 +51,7 @@ const Cart = () => {
         default:
           return 2.50
       }
-    } else if (product.category === "cupcakes") {
+    } else if (product.category === "Cupcakes") {
       switch (quantityOption) {
         case "6":
           return 15
