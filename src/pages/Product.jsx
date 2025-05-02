@@ -3,10 +3,11 @@ import { useParams } from "react-router-dom"
 import { ShopContext } from "../context/ShopContext"
 import { assets } from "../assets/assets"
 import RelatedProducts from "../components/RelatedProducts"
+import ReviewSection from "../components/ReviewSection"
 
 const Product = () => {
   const { productId } = useParams()
-  const { products, currency, addToCart, cartItems, formatPrice } = useContext(ShopContext)
+  const { products, currency, addToCart, cartItems, formatPrice, token } = useContext(ShopContext)
   const [productData, setProductData] = useState(null)
   const [image, setImage] = useState("")
   const [selectedQty, setSelectedQty] = useState("1")
@@ -31,7 +32,7 @@ const Product = () => {
     }
 
     if (["Cookies", "Cupcakes", "Muffins"].includes(productData.category)) {
-      const basePrice = productData.price || 2.5
+      const basePrice = productData.price
       switch (selectedQty) {
         case "6":
           return basePrice * 4
@@ -175,21 +176,12 @@ const Product = () => {
       <div className="mt-20">
         <div className="flex">
           <b className="border px-5 py-3 text-sm">Description</b>
-          <p className="border px-5 py-3 text-sm">Reviews(23,493)</p>
+          <p className="border px-5 py-3 text-sm">Reviews</p>
         </div>
         <div className="flex flex-col gap-4 border px-6 py-6 text-sm text-gray-500">
-          <p>
-            Our bakery is built on a love for sharing sweet moments, one bite at a time. We specialize in homemade
-            Cookies, Cupcakes, Cakes, and Muffins, each made with care, creativity, and the finest ingredients. Whether
-            you're celebrating something special or just treating yourself, our baked goods are crafted to bring joy
-            and comfort with every bite.
-          </p>
-          <p>
-            From soft and chewy Cookies to fluffy Cupcakes, rich Cakes, and golden Muffins, there's something for every
-            sweet tooth. Our online shop makes it easy to explore our menu, choose your favorite flavors, and order
-            exactly what you need — whether it's one treat, a half dozen, or a full box to share.
-          </p>
-          <RelatedProducts category={productData.category} subCategory={productData.subCategory} />
+          <p>{productData?.description}</p>
+          <ReviewSection productId={productId} token={token} />
+          <RelatedProducts category={productData?.category} subCategory={productData?.subCategory} />
         </div>
       </div>
     </div>

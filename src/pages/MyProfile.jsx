@@ -10,7 +10,7 @@ const MyProfile = () => {
   const [formData, setFormData] = useState({
     firstName: user?.firstName || '',
     lastName: user?.lastName || '',
-    email: user?.email || '',
+    email: user?.email || '', // Automatically fill with logged-in user's email
     phone: user?.phone || '',
     address: {
       street: user?.address?.street || '',
@@ -20,6 +20,7 @@ const MyProfile = () => {
       zipcode: user?.address?.zipcode || '',
     }
   });
+  
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -45,9 +46,20 @@ const MyProfile = () => {
     setLoading(true);
 
     try {
+      const profileData = {
+        ...formData,
+        address: {
+          street: formData.address.street,
+          city: formData.address.city,
+          state: formData.address.state,
+          country: formData.address.country,
+          zipcode: formData.address.zipcode
+        }
+      };
+
       const response = await axios.post(
-        
-        formData,
+        `${backendURL}/api/user/update`,
+        profileData,
         { headers: { token } }
       );
 
@@ -106,9 +118,9 @@ const MyProfile = () => {
                     type="email"
                     name="email"
                     value={formData.email}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-[#C586A5] focus:border-[#C586A5]"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed"
                     required
+                    readOnly
                   />
                 </div>
                 <div>

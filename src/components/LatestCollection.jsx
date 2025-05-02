@@ -8,9 +8,12 @@ const LatestCollection = () => {
     const [latestProducts, setLatestProducts] = useState([]);
 
     useEffect(() => {
-        const cookies = products.filter(item => item.category === 'Cookies');
-        setLatestProducts(products.slice(0, 6));  // Set latest products
-    }, []);  
+        // Get only cookie products and sort by date (newest first)
+        const cookies = products
+            .filter(item => item.category === 'Cookies')
+            .sort((a, b) => b.date - a.date);
+        setLatestProducts(cookies.slice(0, 6));
+    }, [products]);
 
     return (
         <div className="my-10">
@@ -24,14 +27,17 @@ const LatestCollection = () => {
             {/* Rendering Products */}
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 gap-y-6">
                 {latestProducts.map((item, index) => (
-                <Productitem key={index} id={item._id} image={item.image} name={item.name} price={item.price}/>
-            ))
-            
-        }
-
-      </div>
-    </div>
-  )
-}
+                    <Productitem 
+                        key={item._id || index} 
+                        id={item._id} 
+                        image={item.image} 
+                        name={item.name} 
+                        price={item.price}
+                    />
+                ))}
+            </div>
+        </div>
+    );
+};
 
 export default LatestCollection

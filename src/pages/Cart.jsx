@@ -3,9 +3,10 @@ import { ShopContext } from "../context/ShopContext"
 import CartTotal from "../components/CartTotal"
 import QuantityInput from "../components/QuantityInput"
 import { assets } from "../assets/assets"
+import Title from "../components/Title"
 
 const Cart = () => {
-  const { products, currency, cartItems, deleteCartItem, updateCartQuantity, navigate } = useContext(ShopContext)
+  const { products, currency, cartItems, deleteCartItem, updateCartQuantity, navigate, requireAuth } = useContext(ShopContext)
   const [cartData, setCartData] = useState([])
   const [inputValues, setInputValues] = useState({}) // For tracking input field values
 
@@ -96,88 +97,101 @@ const Cart = () => {
     updateCartQuantity(itemId, side, newQuantity)
   }
 
+  const handleCheckout = () => {
+    if (requireAuth()) {
+      navigate('/place-order')
+    }
+  }
+
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
-      <div className="border-b pb-2 mb-8">
-        <h1 className="text-xl font-medium">
-          YOUR <span className="font-bold">CART</span>
-        </h1>
+    <div className='border-t pt-16'>
+      <div className='text-2xl'>
+        <Title text1={'YOUR'} text2={'CART'} />
       </div>
-
       {cartData.length === 0 ? (
-        <div className="py-8 text-center text-gray-500">Your cart is empty</div>
+        <div className='text-center py-8'>
+          <p className='text-gray-500'>Your cart is empty</p>
+          <button 
+            onClick={() => navigate('/collection')} 
+            className='mt-4 bg-black text-white px-6 py-2 rounded hover:bg-gray-700'
+          >
+            Continue Shopping
+          </button>
+        </div>
       ) : (
-        <div className="space-y-6">
-          {cartData.map((item, index) => {
-            const productData = products.find((product) => product._id === item._id)
-            const itemPrice = calculatePrice(productData, item.side)
-            const cartItemKey = `${item._id}-${item.side}`
+        <div className='grid grid-cols-1 md:grid-cols-3 gap-8 mt-8'>
+          <div className='md:col-span-2'>
+            {/* Cart items list */}
+            {cartData.map((item, index) => {
+              const productData = products.find((product) => product._id === item._id)
+              const itemPrice = calculatePrice(productData, item.side)
+              const cartItemKey = `${item._id}-${item.side}`
 
-            return (
-              <div key={index} className="flex items-center border-b pb-6">
-                {/* Product Image */}
-                <div className="w-20 h-20 bg-gray-100 overflow-hidden mr-4">
-                  {productData ? (
-                    <img
-                      src={getProductImage(productData) || "/placeholder.svg"}
-                      alt={productData.name || "Product"}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        console.log("Image failed to load:", e)
-                        e.target.src = "/placeholder.svg"
-                      }}
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                      <span className="text-xs text-gray-500">No image</span>
-                    </div>
-                    
-                  )}
-                </div>
-                
-
-                {/* Product Details */}
-                <div className="flex-1">
-                  <h3 className="font-medium text-gray-800">{productData ? productData.name : "Product not found"}</h3>
-                  <div className="flex items-center text-sm text-gray-500 mt-1">
-                    <span className="mr-4">
-                      {currency}
-                      {itemPrice.toFixed(2)}
-                    </span>
-                    <span>{formatQuantity(item.side)}</span>
+              return (
+                <div key={index} className="flex items-center border-b pb-6">
+                  {/* Product Image */}
+                  <div className="w-20 h-20 bg-gray-100 overflow-hidden mr-4">
+                    {productData ? (
+                      <img
+                        src={getProductImage(productData) || "/placeholder.svg"}
+                        alt={productData.name || "Product"}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          console.log("Image failed to load:", e)
+                          e.target.src = "/placeholder.svg"
+                        }}
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                        <span className="text-xs text-gray-500">No image</span>
+                      </div>
+                      
+                    )}
                   </div>
+                  
+
+                  {/* Product Details */}
+                  <div className="flex-1">
+                    <h3 className="font-medium text-gray-800">{productData ? productData.name : "Product not found"}</h3>
+                    <div className="flex items-center text-sm text-gray-500 mt-1">
+                      <span className="mr-4">
+                        {currency}
+                        {itemPrice.toFixed(2)}
+                      </span>
+                      <span>{formatQuantity(item.side)}</span>
+                    </div>
+                  </div>
+
+                  {/* Quantity Input with Arrows */}
+                  <div className="flex items-center mx-4">
+                    <QuantityInput
+                      value={item.quantity}
+                      onChange={(value) => handleInputChange(item._id, item.side, value)}
+                      onBlur={(value) => handleInputBlur(item._id, item.side, value)}
+                    />
+                  </div>
+
+                  {/* Delete Button - Now completely removes the item */}
+                  <button
+                    onClick={() => deleteCartItem(item._id, item.side)}
+                    className="text-gray-400 hover:text-red-500 transition-colors"
+                    aria-label="Delete item"
+                  >
+                     <img className='w-4 mr-4 sm:w-5 cursor-pointer'src={assets.trash} alt=''/>
+                  </button>
                 </div>
-
-                {/* Quantity Input with Arrows */}
-                <div className="flex items-center mx-4">
-                  <QuantityInput
-                    value={item.quantity}
-                    onChange={(value) => handleInputChange(item._id, item.side, value)}
-                    onBlur={(value) => handleInputBlur(item._id, item.side, value)}
-                  />
-                </div>
-
-                {/* Delete Button - Now completely removes the item */}
-                <button
-                  onClick={() => deleteCartItem(item._id, item.side)}
-                  className="text-gray-400 hover:text-red-500 transition-colors"
-                  aria-label="Delete item"
-                >
-                   <img className='w-4 mr-4 sm:w-5 cursor-pointer'src={assets.trash} alt=''/>
-                </button>
-              </div>
-            )
-          })}
-          
-
-          {/* Cart Totals */}
-          <CartTotal />
-          <div className="mt-6">
-        <button onClick={()=>navigate('/place-order')} className="w-full bg-black text-white py-3 font-medium hover:bg-gray-800 transition">CHECKOUT</button>
-        <button onClick={()=>navigate('/collection')} className="w-full border border-black py-3 font-medium hover:bg-gray-50 transition mt-3">
-          CONTINUE SHOPPING
-        </button>
-      </div>
+              )
+            })}
+          </div>
+          <div className='md:col-span-1'>
+            <CartTotal />
+            <button 
+              onClick={handleCheckout}
+              className='w-full bg-black text-white py-3 mt-4 rounded hover:bg-gray-700'
+            >
+              Proceed to Checkout
+            </button>
+          </div>
         </div>
       )}
     </div>

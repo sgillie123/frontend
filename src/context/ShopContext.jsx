@@ -1,8 +1,9 @@
 "use client"
 
 import { createContext, useEffect, useState } from "react"
-import { products } from "../assets/assets"
 import { useNavigate } from "react-router-dom"
+import { toast } from "react-toastify"
+import axios from "axios"
 
 // Create context outside of any component function
 const ShopContext = createContext(null)
@@ -13,8 +14,168 @@ function ShopContextProvider(props) {
   const delivery_fee = 10
   const [search, setSearch] = useState("")
   const [showSearch, setShowSearch] = useState(false)
-  const [cartItems, setCartItems] = useState({})
-  const navigate= useNavigate();
+  const [products, setProducts] = useState([])
+  const [cartItems, setCartItems] = useState(() => {
+    // Try to load cart from localStorage first
+    const savedCart = localStorage.getItem("cartItems");
+    return savedCart ? JSON.parse(savedCart) : {};
+  })
+  const [token, setToken] = useState(() => {
+    // Initialize token from localStorage
+    return localStorage.getItem("token") || ""
+  })
+  const [user, setUser] = useState(() => {
+    // Initialize user from localStorage
+    const savedUser = localStorage.getItem("user")
+    return savedUser ? JSON.parse(savedUser) : null
+  })
+  const backendURL = "http://localhost:4000"
+  const navigate = useNavigate();
+
+  // Fetch products from backend
+  const fetchProducts = async () => {
+    try {
+      const response = await axios.get(`${backendURL}/api/product/list`)
+      if (response.data?.success && response.data.products) {
+        setProducts(response.data.products)
+      }
+    } catch (error) {
+      console.error("Error fetching products:", error)
+    }
+  }
+
+  // Fetch products on mount and every 30 seconds
+  useEffect(() => {
+    fetchProducts()
+    const interval = setInterval(fetchProducts, 30000) // Refresh every 30 seconds
+    return () => clearInterval(interval)
+  }, [])
+
+  // Verify token and refresh user data on mount and token changes
+  useEffect(() => {
+    const verifyToken = async () => {
+      if (!token) {
+        setUser(null)
+        localStorage.removeItem("token")
+        localStorage.removeItem("user")
+        return
+      }
+
+      try {
+        const response = await axios.get(`${backendURL}/api/user/verify`, {
+          headers: { token }
+        })
+        
+        if (response.data.success) {
+          setUser(response.data.user)
+          localStorage.setItem("user", JSON.stringify(response.data.user))
+        } else {
+          // Token is invalid
+          setToken("")
+          setUser(null)
+          localStorage.removeItem("token")
+          localStorage.removeItem("user")
+          toast.error("Session expired. Please login again")
+          navigate("/login")
+        }
+      } catch (error) {
+        console.error("Token verification error:", error)
+        // Clear invalid token
+        setToken("")
+        setUser(null)
+        localStorage.removeItem("token")
+        localStorage.removeItem("user")
+        toast.error("Session expired. Please login again")
+        navigate("/login")
+      }
+    }
+
+    verifyToken()
+  }, [token, backendURL, navigate])
+
+  // Save token to localStorage whenever it changes
+  useEffect(() => {
+    if (token) {
+      localStorage.setItem("token", token)
+    } else {
+      localStorage.removeItem("token")
+      localStorage.removeItem("user")
+    }
+  }, [token])
+
+  // Load cart from backend when user logs in
+  useEffect(() => {
+    const loadUserCart = async () => {
+      if (user?._id && token) {
+        try {
+          const response = await axios.get(`${backendURL}/api/cart/get`, {
+            headers: { token }
+          });
+          if (response.data.success) {
+            setCartItems(response.data.cartData || {});
+            localStorage.setItem("cartItems", JSON.stringify(response.data.cartData || {}));
+          }
+        } catch (error) {
+          console.error('Error loading cart:', error);
+          // If backend fails, keep using localStorage cart
+          const savedCart = localStorage.getItem("cartItems");
+          if (savedCart) {
+            setCartItems(JSON.parse(savedCart));
+          }
+        }
+      }
+    };
+    loadUserCart();
+  }, [user, token, backendURL]);
+
+  // Save cart to both localStorage and backend when it changes
+  useEffect(() => {
+    // Always save to localStorage
+    localStorage.setItem("cartItems", JSON.stringify(cartItems));
+
+    // Save to backend if user is logged in
+    const saveCartToBackend = async () => {
+      if (user?._id && token) {
+        try {
+          await axios.post(
+            `${backendURL}/api/cart/add`,
+            { cartData: cartItems },
+            { headers: { token } }
+          );
+        } catch (error) {
+          console.error('Error saving cart:', error);
+          // Continue silently as the cart is saved in localStorage
+        }
+      }
+    };
+    saveCartToBackend();
+  }, [cartItems, user, token, backendURL]);
+
+  // Clear cart only when user explicitly logs out
+  const handleLogout = () => {
+    setToken("")
+    setUser(null)
+    setCartItems({})
+    localStorage.removeItem("cartItems")
+    localStorage.removeItem("token")
+    localStorage.removeItem("user")
+    navigate("/login")
+  }
+
+  // Function to check if user is authenticated
+  const isAuthenticated = () => {
+    return !!token && !!user
+  }
+
+  // Function to require authentication
+  const requireAuth = () => {
+    if (!isAuthenticated()) {
+      toast.error("Please login to continue")
+      navigate("/login")
+      return false
+    }
+    return true
+  }
 
   // Format price consistently across the app
   const formatPrice = (price) => {
@@ -41,7 +202,15 @@ function ShopContextProvider(props) {
 
       // Update the cart state
       setCartItems(cartData)
-      console.log("Cart updated successfully:", cartData)
+
+      // If user is logged in, update backend
+      if (user && token) {
+        await axios.post(
+          `${backendURL}/api/cart/add`,
+          { cartData },
+          { headers: { token } }
+        );
+      }
     } catch (error) {
       console.error("Error adding to cart:", error)
     }
@@ -167,13 +336,22 @@ function ShopContextProvider(props) {
     showSearch,
     setShowSearch,
     cartItems,
+    setCartItems,
     addToCart,
     removeFromCart,
     deleteCartItem,
     updateCartQuantity,
     getCartCount,
     formatPrice,
-    navigate
+    navigate,
+    backendURL,
+    token,
+    setToken,
+    user,
+    setUser,
+    isAuthenticated,
+    requireAuth,
+    handleLogout
   }
 
   return <ShopContext.Provider value={value}>{props.children}</ShopContext.Provider>
